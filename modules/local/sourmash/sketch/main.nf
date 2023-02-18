@@ -9,9 +9,9 @@ process SOURMASH_SKETCH {
 
     input:
     tuple val(meta), path(sequence)
-    val ksize
-    val scaled
-    val alphabet
+    each alphabet
+    each ksize
+    each scaled
 
     output:
     tuple val(meta), path("*.sig"), emit: signatures

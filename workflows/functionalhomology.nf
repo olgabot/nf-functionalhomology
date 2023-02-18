@@ -78,18 +78,24 @@ workflow FUNCTIONALHOMOLOGY {
     ch_scaleds = Channel.from(params.scaled_min..params.scaled_max)
     ch_alphabets = Channel.from(params.alphabets?.toString()?.tokenize(","))
 
-    ch_ksizes.view()
-    ch_scaleds.view()
-    ch_alphabets.view()
+    // ch_ksizes.view()
+    // ch_scaleds.view()
+    // ch_alphabets.view()
 
+    // reads_sketch_parameters = INPUT_CHECK.out.reads
+    //     .combine(ch_ksizes)
+    //     .combine(ch_scaleds)
+    //     .combine(ch_alphabets)
+
+    // reads_sketch_parameters.view()
     //
     // MODULE: Run Sourmash Sketch
     //
     SOURMASH_SKETCH (
         INPUT_CHECK.out.reads,
+        ch_alphabets,
         ch_ksizes,
-        ch_scaleds,
-        ch_alphabets
+        ch_scaleds
     )
     ch_versions = ch_versions.mix(SOURMASH_SKETCH.out.versions.first())
 
