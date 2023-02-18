@@ -14,7 +14,7 @@ process SOURMASH_SKETCH {
     each scaled
 
     output:
-    tuple val(meta), path("*.sig"), emit: signatures
+    tuple val(meta), path("*.sig.gz"), emit: signatures
     path "versions.yml"           , emit: versions
 
     when:
