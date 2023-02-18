@@ -25,16 +25,18 @@ class RowChecker:
     """
 
     VALID_FORMATS = (
-        ".fq.gz",
-        ".fastq.gz",
+        ".fa.gz",
+        ".fasta.gz",
+        ".fasta",
+        ".fa",
+        ".faa",
+        ".faa.gz",
     )
 
     def __init__(
         self,
         sample_col="sample",
-        first_col="fastq_1",
-        second_col="fastq_2",
-        single_col="single_end",
+        first_col="fasta",
         **kwargs,
     ):
         """
