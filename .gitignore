@@ -10,3 +10,4 @@ execution_trace*.txt
 execution_report*.html
 execution_timeline*.html
 pipeline_dag*.html
+*sig.gz
