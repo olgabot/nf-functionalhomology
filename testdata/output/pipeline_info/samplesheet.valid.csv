@@ -1,0 +1,4 @@
+sample,fasta,single_end
+borrelia_T1,testdata/borrelia_uniprot-2022.12.04-16.05.14.64.fa.gz,true
+c_elegans_T1,testdata/Caenorhabditis_elegans.WBcel235.pep.ced.fa,true
+human_T1,testdata/gencode.v38.basic.annotation.protein.BCL2.ACTB.fa,true

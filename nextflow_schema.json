@@ -30,8 +30,14 @@
                     "type": "integer",
                     "default": 5,
                     "description": "Minimum scaled, as in 1/scaled to search with"
+                },
+                "alphabets": {
+                    "type": "string",
+                    "default": "hp,dayhoff,protein",
+                    "description": "Protein alphabets to use"
                 }
-            }
+            },
+            "required": ["alphabets", "scaled_max", "scaled_min", "ksize_max", "ksize_min"]
         },
         "input_output_options": {
             "title": "Input/output options",
@@ -57,11 +63,10 @@
                     "fa_icon": "fas fa-folder-open"
                 },
                 "email": {
-                    "type": "string",
+                    "type": "number",
                     "description": "Email address for completion summary.",
                     "fa_icon": "fas fa-envelope",
-                    "help_text": "Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits. If set in your user config file (`~/.nextflow/config`) then you don't need to specify this on the command line for every run.",
-                    "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$"
+                    "help_text": "Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits. If set in your user config file (`~/.nextflow/config`) then you don't need to specify this on the command line for every run."
                 },
                 "multiqc_title": {
                     "type": "string",
