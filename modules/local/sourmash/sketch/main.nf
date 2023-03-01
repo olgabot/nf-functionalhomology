@@ -1,5 +1,5 @@
 process SOURMASH_SKETCH {
-    tag "$meta.id"
+    tag "${meta.id}.${alphabet}.k${ksize}.scaled${scaled}"
     label 'process_low'
 
     conda "bioconda::sourmash=4.5.0"
@@ -14,7 +14,7 @@ process SOURMASH_SKETCH {
     each scaled
 
     output:
-    tuple val(meta), path("*.sig.gz"), emit: signatures
+    tuple val(alphabet), val(ksize), val(scaled), val(meta), path("*.sig.gz"), emit: signatures
     path "versions.yml"           , emit: versions
 
     when:
