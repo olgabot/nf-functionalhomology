@@ -17,6 +17,16 @@ for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true
 // Check mandatory parameters
 if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
 
+ch_ksizes = Channel.from(params.ksize_min..params.ksize_max)
+ch_scaleds = Channel.from(params.scaled_min..params.scaled_max)
+ch_alphabets = Channel.from(params.alphabets?.toString()?.tokenize(","))
+// n_ksizes = ch_ksizes.count().collect()
+// n_scaleds = ch_scaleds.count().collect()
+// n_alphabets = ch_alphabets.count().collect()
+// println("n_ksizes: ${n_ksizes}")
+// println("n_scaleds: ${n_scaleds}")
+// println("n_alphabets: ${n_alphabets}")
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     CONFIG FILES
@@ -34,6 +44,7 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 include { SOURMASH_SKETCH             } from '../modules/local/sourmash/sketch/main'
+include { SOURMASH_MULTISEARCH        } from '../modules/local/sourmash/multisearch/main'
 
 
 //
@@ -74,10 +85,10 @@ workflow FUNCTIONALHOMOLOGY {
     )
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
 
-    ch_ksizes = Channel.from(params.ksize_min..params.ksize_max)
-    ch_scaleds = Channel.from(params.scaled_min..params.scaled_max)
-    ch_alphabets = Channel.from(params.alphabets?.toString()?.tokenize(","))
-
+    // n_inputs = INPUT_CHECK.out.reads.count().valueOf()
+    // println("n_inputs: ${n_inputs}")
+    // n_iterations = n_ksizes * n_scaleds * n_alphabets * n_inputs
+    // println("Total expected number of sketches: ${n_iterations}")
     // ch_ksizes.view()
     // ch_scaleds.view()
     // ch_alphabets.view()
@@ -98,6 +109,31 @@ workflow FUNCTIONALHOMOLOGY {
         ch_scaleds
     )
     ch_versions = ch_versions.mix(SOURMASH_SKETCH.out.versions.first())
+
+    ch_signatures_by_sketch_params = SOURMASH_SKETCH.out.signatures
+        .groupTuple(by: [0, 1, 2])
+
+    // ch_signatures_by_sketch_params.view()
+
+    ch_query_with_dbs = SOURMASH_SKETCH.out.signatures.join(
+        ch_signatures_by_sketch_params, by: [0, 1, 2])
+    // ch_query_with_dbs.view()
+
+    // ch_query_with_dbs_transpose = SOURMASH_SKETCH.out.signatures.transpose(
+    //     ch_signatures_by_sketch_params, by: [0, 1, 2])
+    // ch_query_with_dbs_transpose.view()
+    // ch_query_with_dbs.transpose().view()
+
+    ch_query_with_dbs_unnested = ch_query_with_dbs.map{
+        tuple(it[0], it[1], it[2], it[3], it[4], it[6])
+    }
+    ch_query_with_dbs_unnested_query_removed = ch_query_with_dbs_unnested.map{
+        alpha, k, scaled, meta, query, dbs ->
+        tuple(alpha, k, scaled, meta, query, dbs.findAll{ it != query })
+    }
+    // ch_query_with_dbs_unnested.view()
+
+    SOURMASH_MULTISEARCH(ch_query_with_dbs_unnested_query_removed)
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
